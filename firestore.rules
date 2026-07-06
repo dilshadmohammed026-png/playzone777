@@ -1,0 +1,56 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Catch-all rule: Deny everything by default
+    match /{document=**} {
+      allow read, write: if false;
+    }
+    
+    // Check if the user is authenticated (Admin)
+    function isAdmin() {
+      return request.auth != null;
+    }
+
+    // Games collection
+    match /games/{gameId} {
+      allow read: if true;
+      // Allow visitors to increment stats, or Admins to make any changes
+      allow create, delete: if isAdmin();
+      allow update: if isAdmin() || 
+                    request.resource.data.diff(resource.data).affectedKeys().hasOnly(['clicks', 'downloadClicks', 'websiteClicks', 'referralClicks', 'lastClickTime']);
+    }
+    
+    // Analytics & Configuration (settings_config, image_assets, custom events)
+    match /analytics/{docId} {
+      // settings_config and image_assets must be readable by visitors. user fingerprints can be read by visitors.
+      allow read: if true;
+      
+      // Allow visitors to create any event document, or set/update their own user fingerprint document
+      allow create: if (docId != 'settings_config' && docId != 'image_assets') || isAdmin();
+      allow update: if (docId.startsWith('user_') && !docId.startsWith('settings_config') && !docId.startsWith('image_assets')) || isAdmin();
+      
+      allow delete: if isAdmin();
+    }
+
+    // Reports collection
+    match /reports/{reportId} {
+      // Visitors can submit reports (create only) and read reports to show caution warnings, Admins can manage them (read, update, delete)
+      allow create, read: if true;
+      allow update, delete: if isAdmin();
+    }
+
+    // Ad Analytics collection
+    match /ad_analytics/{eventId} {
+      // Visitors can track ad events (create only), Admins can read them
+      allow create: if true;
+      allow read: if isAdmin();
+    }
+
+    // Admins collection
+    match /admins/{adminEmail} {
+      // Read allowed for logging in or verifying, write only for authenticated Admins
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+  }
+}

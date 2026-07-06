@@ -1,0 +1,6 @@
+{
+  "name": "Play777Zone",
+  "description": "Play777Zone - India's Best Gaming App Directory with Admin Panel",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

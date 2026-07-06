@@ -1,0 +1,92 @@
+{
+  "entities": {
+    "Game": {
+      "title": "Game",
+      "description": "A game listing in the directory",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "category": { "type": "string" },
+        "bonus": { "type": "string" },
+        "trending": { "type": "boolean" },
+        "iconType": { "type": "string" },
+        "link": { "type": "string" },
+        "logoUrl": { "type": "string" },
+        "clicks": { "type": "number" },
+        "createdAt": { "type": "number" }
+      },
+      "required": ["title", "category", "bonus", "trending", "iconType", "clicks"]
+    },
+    "AnalyticsEvent": {
+      "title": "AnalyticsEvent",
+      "description": "Event logged for application analytics",
+      "type": "object",
+      "properties": {
+        "gameId": { "type": "number" },
+        "type": { "type": "string", "enum": ["view", "download", "referral", "website_view"] },
+        "platform": { "type": "string" },
+        "timestamp": { "type": "number" }
+      },
+      "required": ["type", "timestamp"]
+    },
+    "AppSettings": {
+      "title": "AppSettings",
+      "description": "Configuration settings for AdSense, homepage banners, and redirect URLs",
+      "type": "object",
+      "properties": {
+        "adsenseEnabled": { "type": "boolean" },
+        "adsenseTopCode": { "type": "string" },
+        "adsenseMiddleCode": { "type": "string" },
+        "adsenseBottomCode": { "type": "string" },
+        "adsenseDetailsCode": { "type": "string" },
+        "homepageBanners": { "type": "array" },
+        "websiteReferralUrl": { "type": "string" }
+      },
+      "required": ["adsenseEnabled"]
+    },
+    "LinkReport": {
+      "title": "LinkReport",
+      "description": "User reported problem/feedback on our links",
+      "type": "object",
+      "properties": {
+        "appId": { "type": "number" },
+        "appTitle": { "type": "string" },
+        "issueType": { "type": "string" },
+        "comment": { "type": "string" },
+        "createdAt": { "type": "number" },
+        "status": { "type": "string" }
+      },
+      "required": ["appId", "appTitle", "issueType", "createdAt", "status"]
+    },
+    "AdAnalyticsEvent": {
+      "title": "AdAnalyticsEvent",
+      "description": "Event logged for advertising analytics",
+      "type": "object",
+      "properties": {
+        "type": { "type": "string", "enum": ["impression", "click"] },
+        "adUnit": { "type": "string" },
+        "platform": { "type": "string", "enum": ["desktop", "mobile"] },
+        "timestamp": { "type": "number" }
+      },
+      "required": ["type", "adUnit", "platform", "timestamp"]
+    }
+  },
+  "firestore": {
+    "/games/{gameId}": {
+      "schema": { "$ref": "#/entities/Game" },
+      "description": "Stores individual game listings"
+    },
+    "/analytics/{eventId}": {
+      "schema": { "$ref": "#/entities/AnalyticsEvent" },
+      "description": "Stores individual analytics tracking events and site configs"
+    },
+    "/reports/{reportId}": {
+      "schema": { "$ref": "#/entities/LinkReport" },
+      "description": "Stores user feedback and reported database issues"
+    },
+    "/ad_analytics/{eventId}": {
+      "schema": { "$ref": "#/entities/AdAnalyticsEvent" },
+      "description": "Stores individual ad tracking events"
+    }
+  }
+}
